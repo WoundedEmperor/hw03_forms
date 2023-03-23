@@ -105,7 +105,7 @@ def post_edit(request, post_id):
         'form': form,
         'is_edit': is_edit,
     }
-    if request.user != post.author.id:
+    if request.user != post.author:
         return redirect('posts:post_detail', post_id)
     if request.method == 'POST':
         form = PostForm(request.POST, instance=post)
