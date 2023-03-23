@@ -22,8 +22,16 @@ class Post(models.Model):
         related_name='posts'
     )
     group = models.ForeignKey(
-        'Group',
+        Group,
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
-        related_name='group_posts',)
+        related_name='group_posts',
+    )
+
+    class Meta:
+        default_related_name = 'posts'
+        ordering = ['-pub_date']
+
+    def __str__(self) -> str:
+        return self.text[:15]
