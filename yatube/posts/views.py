@@ -64,11 +64,13 @@ def post_detail(request, post_id):
     post_pub_date = post.pub_date.strftime('%d.%m.%Y')
     post_text = post.text[:30]
     post_count = Post.objects.filter(author=post.author).count()
+    author = post.author
     context = {
         'post': post,
         'post_count': post_count,
         'post_pub_date': post_pub_date,
         'post_text': post_text,
+        'author': author,
     }
     return render(request, template, context)
 

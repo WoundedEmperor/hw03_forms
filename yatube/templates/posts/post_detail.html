@@ -28,7 +28,7 @@
           </a>
         </li>
         <li class="list-group-item">
-          {% if post.author == author %}
+          {% if post.author == user %}
             <a href="{% url 'posts:post_edit' post.pk %}">редактировать запись</a>
           {% endif %}
         </li>
