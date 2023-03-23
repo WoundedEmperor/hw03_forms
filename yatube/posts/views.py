@@ -85,12 +85,12 @@ def post_create(request):
     }
 
     if request.method == 'POST':
-        post = form.save(commit=False)
         if form.is_valid():
-            form.instance.author = request.user
+            post = form.save(commit=False)
+            post.author = request.user
             post.save()
-        return redirect('posts:profile', post.author)
-    return render(request, template, context)
+            return redirect('posts:profile', post.author)
+        return render(request, template, context)
 
 
 @login_required
