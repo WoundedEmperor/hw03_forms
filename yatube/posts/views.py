@@ -44,8 +44,10 @@ def group_posts(request, slug):
 
 
 def profile(request, username):
-    post_list = (Post.objects.filter(author__username=username).
-                 order_by('-pub_date'))
+    post_list = (
+        Post.objects.filter(author__username=username).
+        order_by('-pub_date')
+    )
     paginator = Paginator(post_list, POST_NUM)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -61,14 +63,14 @@ def profile(request, username):
 def post_detail(request, post_id):
     template = 'posts/post_detail.html'
     post = get_object_or_404(Post, pk=post_id)
-    post_pub_date = post.pub_date.strftime('%d.%m.%Y')
     post_text = post.text[:30]
     post_count = Post.objects.filter(author=post.author).count()
     author = post.author
+
     context = {
+        'post_id': post_id,
         'post': post,
         'post_count': post_count,
-        'post_pub_date': post_pub_date,
         'post_text': post_text,
         'author': author,
     }
@@ -98,7 +100,12 @@ def post_edit(request, post_id):
     template = 'posts/create_post.html'
     post = get_object_or_404(Post, pk=post_id)
     is_edit = True
-    if request.user.id != post.author.id:
+    form = PostForm(instance=post)
+    context = {
+        'form': form,
+        'is_edit': is_edit,
+    }
+    if request.user != post.author.id:
         return redirect('posts:post_detail', post_id)
     if request.method == 'POST':
         form = PostForm(request.POST, instance=post)
@@ -108,9 +115,4 @@ def post_edit(request, post_id):
         return render(
             request, template, {'form': form}
         )
-    form = PostForm(instance=post)
-    context = {
-        'form': form,
-        'is_edit': is_edit,
-    }
     return render(request, template, context)
