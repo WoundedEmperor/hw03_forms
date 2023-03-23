@@ -1,12 +1,8 @@
-from django.core.paginator import Paginator
-
 from django.shortcuts import render, get_object_or_404, redirect
-
-from django.contrib.auth.decorators import login_required
-
+from django.core.paginator import Paginator
 from .models import Post, Group, User
-
 from .forms import PostForm
+from django.contrib.auth.decorators import login_required
 
 
 POST_NUM = 10
@@ -28,7 +24,7 @@ def index(request):
 def group_posts(request, slug):
     group_none = get_object_or_404(Group, slug=slug)
     post_list = Post.objects.all().order_by('-pub_date')
-    paginator = Paginator(post_list, 10)
+    paginator = Paginator(post_list, POST_NUM)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     posts = (Post.objects.filter(group=group_none)
