@@ -84,13 +84,12 @@ def post_create(request):
         'title': 'Новый пост',
     }
 
-    if request.method == 'POST':
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
-            return redirect('posts:profile', post.author)
-        return render(request, template, context)
+    if form.is_valid():
+        post = form.save(commit=False)
+        post.author = request.user
+        post.save()
+        return redirect('posts:profile', post.author)
+    return render(request, template, context)
 
 
 @login_required
