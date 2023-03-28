@@ -1,16 +1,20 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.core.paginator import Paginator
-from .models import Post, Group, User
-from .forms import PostForm
+
 from django.contrib.auth.decorators import login_required
+
+from django.core.paginator import Paginator
+
+from .models import Post, Group, User
+
+from .forms import PostForm
 
 
 POST_NUM = 10
 
 
 def index(request):
-    post_list = Post.objects.all().order_by('-pub_date')
-    paginator = Paginator(post_list, 10)
+    post_list = Post.objects.all()  # .order_by('-pub_date')
+    paginator = Paginator(post_list, POST_NUM)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     title = 'Последние обновления на сайте'
@@ -23,27 +27,28 @@ def index(request):
 
 def group_posts(request, slug):
     group_none = get_object_or_404(Group, slug=slug)
-    post_list = Post.objects.all().order_by('-pub_date')
+    post_list = Post.posts.all()  # .order_by('-pub_date')
     paginator = Paginator(post_list, POST_NUM)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    posts = (Post.objects.filter(group=group_none)
-             .order_by('-pub_date')[:POST_NUM])
+    # posts = (
+    #     Post.objects.filter(group=group_none).order_by('-pub_date')[:POST_NUM]
+    # )
     title = 'Посты сообщества.'
     context = {
         'group': group_none,
         'page_obj': page_obj,
-        'posts': posts,
+        # 'posts': posts,
         'title': title,
     }
     return render(request, 'posts/group_list.html', context, slug)
 
 
 def profile(request, username):
+    template = 'posts/profile.html'
     author = get_object_or_404(User, username=username)
     post_list = (
-        Post.objects.filter(author__username=username).
-        order_by('-pub_date')
+        author.posts.select_related('group', 'author').order('-pub_date')
     )
     paginator = Paginator(post_list, POST_NUM)
     page_number = request.GET.get('page')
@@ -55,7 +60,7 @@ def profile(request, username):
         'post_count': post_count,
         'page_obj': page_obj,
     }
-    return render(request, 'posts/profile.html', context)
+    return render(request, template, context)
 
 
 def post_detail(request, post_id):
@@ -107,9 +112,9 @@ def post_edit(request, post_id):
     if request.method == 'POST':
         form = PostForm(request.POST or None, instance=post)
         if form.is_valid():
-            form.save()
+            form.save(commit=False)
             return redirect('posts:post_detail', post_id)
         return render(
-            request, template, {'form': form}
+            request, template, {'form': form, 'is_edit': is_edit}
         )
     return render(request, template, context)
