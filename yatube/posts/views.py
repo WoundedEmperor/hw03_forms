@@ -27,7 +27,7 @@ def index(request):
 
 def group_posts(request, slug):
     group_none = get_object_or_404(Group, slug=slug)
-    post_list = Post.posts.all()  # .order_by('-pub_date')
+    post_list = group_none.posts.all()  # .order_by('-pub_date')
     paginator = Paginator(post_list, POST_NUM)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -48,7 +48,7 @@ def profile(request, username):
     template = 'posts/profile.html'
     author = get_object_or_404(User, username=username)
     post_list = (
-        author.posts.select_related('group', 'author').order('-pub_date')
+        author.posts.select_related('group', 'author').order_by('-pub_date')
     )
     paginator = Paginator(post_list, POST_NUM)
     page_number = request.GET.get('page')
