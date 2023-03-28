@@ -110,12 +110,9 @@ def post_edit(request, post_id):
     }
     if request.user.id != post.author.id:
         return redirect('posts:post_detail', post_id)
-    if request.method == 'POST':
-        form = PostForm(request.POST or None, instance=post)
-        if form.is_valid():
-            form.save(commit=False)
-            return redirect('posts:post_detail', post_id)
-        return render(
-            request, template, {'form': form, 'is_edit': is_edit}
-        )
+    # if request.method == 'POST':
+    form = PostForm(request.POST or None, instance=post)
+    if form.is_valid():
+        form.save(commit=False)
+        return redirect('posts:post_detail', post_id)
     return render(request, template, context)
