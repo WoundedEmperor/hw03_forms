@@ -13,7 +13,8 @@ POST_NUM = 10
 
 
 def index(request):
-    post_list = Post.objects.all()  # .order_by('-pub_date')
+    post_list = Post.objects.all().order_by('-pub_date')
+    # без .order_by('-pub_date') паджинатор не работает
     paginator = Paginator(post_list, POST_NUM)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
