@@ -30,9 +30,7 @@
             {% endfor %}
           {% endif %}
           {% if is_edit %}
-            <form method="post"> <!--href="{% url 'posts:post_edit' form.instance.id %}"-->
-          {% else %}
-            <form method="post"> <!-- href="{% url 'posts:post_create' %}"-->
+            <form method="post">
           {% endif %}
           {% csrf_token %}
             {% for field in form %}

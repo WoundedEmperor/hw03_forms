@@ -1,11 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
-
 from django.contrib.auth.decorators import login_required
-
 from django.core.paginator import Paginator
 
 from .models import Post, Group, User
-
 from .forms import PostForm
 
 
@@ -13,36 +10,31 @@ POST_NUM = 10
 
 
 def index(request):
-    post_list = Post.objects.all().order_by('-pub_date')
-    # без .order_by('-pub_date') паджинатор не работает
+    template = 'posts/index.html'
+    title = 'Последние обновления на сайте'
+    post_list = Post.objects.all().order_by('-pub_date') 
     paginator = Paginator(post_list, POST_NUM)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    title = 'Последние обновления на сайте'
     context = {
-        'page_obj': page_obj,
         'title': title,
+        'page_obj': page_obj,
     }
-    return render(request, 'posts/index.html', context)
+    return render(request, template, context)
 
 
 def group_posts(request, slug):
-    group_none = get_object_or_404(Group, slug=slug)
-    post_list = Group.objects.all().order_by('-pub_date')
+    template = 'posts/group_list.html'
+    group = get_object_or_404(Group, slug=slug)
+    post_list = group.posts.all()
     paginator = Paginator(post_list, POST_NUM)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    # posts = (
-    #     Post.objects.filter(group=group_none).order_by('-pub_date')[:POST_NUM]
-    # )
-    title = 'Посты сообщества.'
     context = {
-        'group': group_none,
+        'group': group,
         'page_obj': page_obj,
-        # 'posts': posts,
-        'title': title,
     }
-    return render(request, 'posts/group_list.html', context, slug)
+    return render(request, template, context)
 
 
 def profile(request, username):
