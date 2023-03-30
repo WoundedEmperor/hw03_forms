@@ -26,13 +26,20 @@ def index(request):
 def group_posts(request, slug):
     template = 'posts/group_list.html'
     group = get_object_or_404(Group, slug=slug)
-    post_list = group.posts.all()
+    post_list = Post.objects.select_related(
+        'group', 'author'
+    ).order_by('-pub_date')
+
     paginator = Paginator(post_list, POST_NUM)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+    posts = (Post.objects.filter(group=group)
+             .order_by('-pub_date')[:POST_NUM])
+    # без предыдущей переменной на странице группы отсутствуют посты
     context = {
         'group': group,
         'page_obj': page_obj,
+        'posts': posts,
     }
     return render(request, template, context)
 
