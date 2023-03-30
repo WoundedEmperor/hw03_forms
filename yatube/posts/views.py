@@ -12,7 +12,7 @@ POST_NUM = 10
 def index(request):
     template = 'posts/index.html'
     title = 'Последние обновления на сайте'
-    post_list = Post.objects.all().order_by('-pub_date') 
+    post_list = Post.objects.all().order_by('-pub_date')
     paginator = Paginator(post_list, POST_NUM)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
