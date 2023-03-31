@@ -6,10 +6,9 @@
 
 {% block content %} 
   <h1>{{ group.title }}</h1> 
-  <p> 
-    {{ group.description }} 
-  </p> 
-  {% for post in posts %} 
+  <p>{{ group.description|linebreaks }}</p>
+   
+  {% for post in page_obj %} 
     <article> 
       <ul> 
         <li> 

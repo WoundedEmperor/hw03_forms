@@ -11,13 +11,12 @@ POST_NUM = 10
 
 def index(request):
     template = 'posts/index.html'
-    title = 'Последние обновления на сайте'
-    post_list = Post.objects.all().order_by('-pub_date')
-    paginator = Paginator(post_list, POST_NUM)
+    posts = Post.objects.select_related('author').all().order_by('-pub_date')
+    paginator = Paginator(posts, POST_NUM)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     context = {
-        'title': title,
+        'posts': posts,
         'page_obj': page_obj,
     }
     return render(request, template, context)
@@ -26,20 +25,13 @@ def index(request):
 def group_posts(request, slug):
     template = 'posts/group_list.html'
     group = get_object_or_404(Group, slug=slug)
-    post_list = Post.objects.select_related(
-        'group', 'author'
-    ).order_by('-pub_date')
-
+    post_list = group.posts.select_related().all()
     paginator = Paginator(post_list, POST_NUM)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    posts = (Post.objects.filter(group=group)
-             .order_by('-pub_date')[:POST_NUM])
-    # без предыдущей переменной на странице группы отсутствуют посты
     context = {
         'group': group,
         'page_obj': page_obj,
-        'posts': posts,
     }
     return render(request, template, context)
 
